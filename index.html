@@ -73,10 +73,10 @@ a:hover{text-decoration:underline}
 <div id="login">
   <h2 style="color:#b098ff;font-size:22px;margin-bottom:4px">Admin Panel</h2>
   <p style="color:#686880;font-size:13px;margin-bottom:8px">SteamToolsLua v2.2.0</p>
-  <input type="password" id="pw-input" placeholder="Site password" autocomplete="off" style="margin-bottom:6px">
-  <input type="password" id="token-input" placeholder="GitHub token" autocomplete="off" style="margin-bottom:10px">
+  <input type="password" id="pw-input" placeholder="Password" autocomplete="off" style="margin-bottom:6px">
+  <input type="password" id="token-input" placeholder="GitHub token" autocomplete="off" style="margin-bottom:8px;font-size:11px">
   <button onclick="login()">Enter</button>
-  <p class="err" id="pw-err">Wrong password or token</p>
+  <p class="err" id="pw-err">Wrong password or missing token</p>
 </div>
 
 <div id="app">
@@ -138,7 +138,7 @@ a:hover{text-decoration:underline}
 </div>
 
 <script>
-const PASSWORD = 'SteamTools42';
+const PASSWORD = 'Ekrem0579';
 const GIST_ID = '6f3df9ed457b97936420526d5f5a431b';
 const GIST_API = 'https://api.github.com/gists/' + GIST_ID;
 const HEADERS = {
