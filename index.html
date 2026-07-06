@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - SteamToolsLua</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#08080e;color:#e0e0f0;font-family:Segoe UI,sans-serif;min-height:100vh}
+#login{display:flex;justify-content:center;align-items:center;min-height:100vh;flex-direction:column;gap:12px}
+#login input{padding:10px 14px;border-radius:6px;border:1px solid #2a2a5a;background:#0a0a16;color:#e0e0f0;font-size:16px;width:260px;outline:none}
+#login input:focus{border-color:#7c6fff}
+#login button{padding:10px 30px;border-radius:6px;border:none;background:#7c6fff;color:#fff;font-size:15px;cursor:pointer}
+#login button:hover{background:#6a5ee8}
+#login .err{color:#f56565;font-size:13px;display:none}
+#app{display:none;flex-direction:column;height:100vh}
+header{background:#0a0a16;border-bottom:1px solid #2a2a5a;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
+header h1{font-size:18px;color:#b098ff}
+header span{color:#686880;font-size:13px}
+#main{display:flex;flex:1;overflow:hidden}
+#sidebar{width:260px;background:#0a0a14;border-right:1px solid #1a1a38;padding:16px;overflow-y:auto;flex-shrink:0}
+#sidebar h3{font-size:13px;color:#7c6fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+#sidebar .dev-item{padding:8px 10px;border-radius:4px;cursor:pointer;margin-bottom:2px;font-size:13px;border:1px solid transparent}
+#sidebar .dev-item:hover{background:#14142a;border-color:#2a2a5a}
+#sidebar .dev-item.active{background:#1c1c3a;border-color:#7c6fff}
+#sidebar .dev-item .name{color:#e0e0f0}
+#sidebar .dev-item .meta{color:#686880;font-size:11px;margin-top:2px}
+#sidebar .badge{display:inline-block;background:#7c6fff;color:#fff;font-size:10px;padding:1px 6px;border-radius:8px;margin-left:6px}
+#content{flex:1;padding:24px;overflow-y:auto}
+#content h2{font-size:16px;margin-bottom:16px}
+.dev-detail{background:#0a0a16;border:1px solid #1a1a38;border-radius:8px;padding:20px;margin-bottom:16px}
+.dev-detail .row{display:flex;margin-bottom:8px;font-size:13px}
+.dev-detail .label{color:#686880;width:100px;flex-shrink:0}
+.dev-detail .value{color:#e0e0f0;word-break:break-all}
+.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.actions button,.actions select{padding:8px 16px;border-radius:6px;border:none;font-size:13px;cursor:pointer}
+.btn-ban{background:#f56565;color:#fff}
+.btn-ban:hover{background:#e05050}
+.btn-unban{background:#48bb78;color:#fff}
+.btn-unban:hover{background:#3ca868}
+.btn-refresh{background:#2a2a5a;color:#e0e0f0}
+.btn-refresh:hover{background:#3a3a7a}
+#banlist{margin-top:20px}
+#banlist table{width:100%;border-collapse:collapse;font-size:13px}
+#banlist th{text-align:left;padding:8px 10px;border-bottom:2px solid #2a2a5a;color:#7c6fff;font-weight:600}
+#banlist td{padding:8px 10px;border-bottom:1px solid #1a1a38}
+#banlist tr:hover td{background:#0a0a16}
+.tag-perm{color:#f56565}
+.tag-time{color:#48bb78}
+.tag-unban{color:#686880}
+.logout-btn{background:transparent;border:1px solid #2a2a5a;color:#686880;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px}
+.logout-btn:hover{color:#f56565;border-color:#f56565}
+#manual-ban{display:flex;gap:8px;margin-top:12px;align-items:center}
+#manual-ban input{padding:8px 12px;border-radius:4px;border:1px solid #2a2a5a;background:#0a0a16;color:#e0e0f0;font-size:13px;outline:none;flex:1}
+#manual-ban input:focus{border-color:#7c6fff}
+#manual-ban select{padding:7px;border-radius:4px;border:1px solid #2a2a5a;background:#0a0a16;color:#e0e0f0;font-size:13px}
+#manual-ban button{background:#f56565;color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #2a2a5a;border-top-color:#7c6fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:6px;color:#fff;font-size:13px;z-index:999;animation:fadeIn .3s}
+.toast.success{background:#48bb78}
+.toast.error{background:#f56565}
+.toast.info{background:#7c6fff}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+a{color:#7c6fff;text-decoration:none}
+a:hover{text-decoration:underline}
+#empty-state{text-align:center;color:#686880;padding:60px 20px}
+#empty-state .icon{font-size:48px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h2 style="color:#b098ff;font-size:22px;margin-bottom:4px">Admin Panel</h2>
+  <p style="color:#686880;font-size:13px;margin-bottom:8px">SteamToolsLua v2.2.0</p>
+  <input type="password" id="pw-input" placeholder="Site password" autocomplete="off" style="margin-bottom:6px">
+  <input type="password" id="token-input" placeholder="GitHub token" autocomplete="off" style="margin-bottom:10px">
+  <button onclick="login()">Enter</button>
+  <p class="err" id="pw-err">Wrong password or token</p>
+</div>
+
+<div id="app">
+  <header>
+    <div>
+      <h1>Admin Panel</h1>
+      <span id="device-count">Loading devices...</span>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn-refresh" onclick="loadData()">Refresh</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div id="main">
+    <div id="sidebar">
+      <h3>Devices</h3>
+      <div id="dev-list"></div>
+      <div style="margin-top:16px;border-top:1px solid #1a1a38;padding-top:12px">
+        <h3>Manual Ban</h3>
+        <div id="manual-ban">
+          <input type="text" id="manual-id" placeholder="pc_name or HWID">
+          <select id="manual-duration">
+            <option value="0">Permanent</option>
+            <option value="24">24 hours</option>
+            <option value="72">3 days</option>
+            <option value="168">7 days</option>
+            <option value="720">30 days</option>
+          </select>
+          <button onclick="manualBan()">Ban</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="content">
+      <div id="device-detail">
+        <div id="empty-state">
+          <div class="icon">&#128187;</div>
+          <p>Select a device from the sidebar</p>
+        </div>
+      </div>
+
+      <div id="banlist" style="display:none">
+        <h2>Blacklist</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Identifier</th>
+              <th>Duration</th>
+              <th>Source</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="banlist-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = 'SteamTools42';
+const GIST_ID = '6f3df9ed457b97936420526d5f5a431b';
+const GIST_API = 'https://api.github.com/gists/' + GIST_ID;
+const HEADERS = {
+  'Authorization': 'token ' + TOKEN,
+  'User-Agent': 'AdminPanel',
+  'Accept': 'application/vnd.github.v3+json'
+};
+
+let devices = [];
+let blacklist = { bans: [], unbans: [] };
+let selectedIdx = -1;
+
+let TOKEN = '';
+
+function login() {
+  const pw = document.getElementById('pw-input').value;
+  const tk = document.getElementById('token-input').value.trim();
+  if (pw === PASSWORD && tk) {
+    TOKEN = tk;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadData();
+  } else {
+    document.getElementById('pw-err').style.display = 'block';
+  }
+}
+
+function logout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-err').style.display = 'none';
+}
+
+async function loadData() {
+  document.getElementById('device-count').textContent = 'Loading...';
+  document.getElementById('dev-list').innerHTML = '<div style="text-align:center;padding:20px;color:#686880"><div class="spinner"></div>Loading...</div>';
+  await Promise.all([loadDevices(), loadBlacklist()]);
+}
+
+async function loadDevices() {
+  try {
+    const r = await fetch(GIST_API, { headers: HEADERS });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const files = data.files || {};
+    const file = files['devices.json'];
+    if (!file || !file.content) {
+      devices = [];
+    } else {
+      devices = JSON.parse(file.content);
+      if (!Array.isArray(devices)) devices = [];
+    }
+  } catch(e) {
+    console.error(e);
+    devices = [];
+  }
+  renderDeviceList();
+}
+
+async function loadBlacklist() {
+  try {
+    const r = await fetch(GIST_API, { headers: HEADERS });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const files = data.files || {};
+    const file = files['blacklist.json'];
+    if (!file || !file.content) {
+      blacklist = { bans: [], unbans: [] };
+    } else {
+      blacklist = JSON.parse(file.content);
+      if (!blacklist.bans) blacklist.bans = [];
+      if (!blacklist.unbans) blacklist.unbans = [];
+    }
+  } catch(e) {
+    console.error(e);
+    blacklist = { bans: [], unbans: [] };
+  }
+  renderBlacklist();
+}
+
+async function saveBlacklist() {
+  try {
+    await fetch(GIST_API, {
+      method: 'PATCH',
+      headers: HEADERS,
+      body: JSON.stringify({
+        files: {
+          'blacklist.json': {
+            content: JSON.stringify(blacklist, null, 2)
+          }
+        }
+      })
+    });
+  } catch(e) {
+    console.error(e);
+    throw e;
+  }
+}
+
+function renderDeviceList() {
+  const el = document.getElementById('dev-list');
+  const count = document.getElementById('device-count');
+  if (devices.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:#686880;font-size:13px">No devices logged yet</div>';
+    count.textContent = '0 devices';
+    return;
+  }
+  count.textContent = devices.length + ' device' + (devices.length !== 1 ? 's' : '');
+  // Show most recent first
+  const sorted = [...devices].reverse();
+  el.innerHTML = sorted.map((d, i) => {
+    const idx = devices.length - 1 - i;
+    const isActive = idx === selectedIdx;
+    const name = d.user || d.pc || 'Unknown';
+    return '<div class="dev-item' + (isActive ? ' active' : '') + '" onclick="selectDevice(' + idx + ')">' +
+      '<div class="name">' + esc(name) + '</div>' +
+      '<div class="meta">' + esc(d.pc || '') + (d.hwid ? ' &middot; ' + d.hwid.substring(0, 8) + '...' : '') + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function selectDevice(idx) {
+  selectedIdx = idx;
+  renderDeviceList();
+  const d = devices[idx];
+  if (!d) return;
+  const el = document.getElementById('device-detail');
+  document.getElementById('banlist').style.display = 'block';
+  el.innerHTML =
+    '<div class="dev-detail">' +
+    '<h2 style="font-size:16px;margin-bottom:14px;color:#b098ff">' + esc(d.user || d.pc || 'Unknown') + '</h2>' +
+    '<div class="row"><div class="label">PC Name</div><div class="value">' + esc(d.pc || '-') + '</div></div>' +
+    '<div class="row"><div class="label">HWID</div><div class="value" style="font-family:monospace;font-size:12px">' + esc(d.hwid || '-') + '</div></div>' +
+    '<div class="row"><div class="label">IP</div><div class="value">' + esc(d.ip || '-') + '</div></div>' +
+    '<div class="row"><div class="label">User</div><div class="value">' + esc(d.user || '-') + '</div></div>' +
+    '<div class="row"><div class="label">Last Seen</div><div class="value">' + esc(d.time || '-') + '</div></div>' +
+    '<div class="actions">' +
+    '<button class="btn-ban" onclick="banDevice(' + idx + ', \'0\')">Ban Permanent</button>' +
+    '<button class="btn-ban" onclick="banDevice(' + idx + ', \'168\')">Ban 7 Days</button>' +
+    '<button class="btn-ban" onclick="banDevice(' + idx + ', \'720\')">Ban 30 Days</button>' +
+    '<button class="btn-unban" onclick="unbanDevice(' + idx + ')">Unban</button>' +
+    '</div>' +
+    '</div>';
+}
+
+async function banDevice(idx, hours) {
+  const d = devices[idx];
+  if (!d) return;
+  const ids = [];
+  if (d.pc) ids.push(d.pc.trim().toLowerCase());
+  if (d.hwid) ids.push(d.hwid.trim().toLowerCase());
+  if (ids.length === 0) { toast('No PC name or HWID to ban', 'error'); return; }
+
+  for (const id of ids) {
+    const suffix = hours === '0' ? '' : ':' + hours + 'h';
+    const entry = id + suffix;
+    if (!blacklist.bans.includes(entry)) {
+      blacklist.bans.push(entry);
+    }
+  }
+  for (const id of ids) {
+    blacklist.unbans = blacklist.unbans.filter(u => u.toLowerCase() !== id);
+  }
+
+  try {
+    await saveBlacklist();
+    renderBlacklist();
+    toast('Banned: ' + ids.join(', ') + (hours !== '0' ? ' for ' + hours + 'h' : ' permanently'), 'success');
+  } catch(e) {
+    toast('Failed to save blacklist', 'error');
+  }
+}
+
+async function unbanDevice(idx) {
+  const d = devices[idx];
+  if (!d) return;
+  const ids = [];
+  if (d.pc) ids.push(d.pc.trim().toLowerCase());
+  if (d.hwid) ids.push(d.hwid.trim().toLowerCase());
+  if (ids.length === 0) { toast('No PC name or HWID', 'error'); return; }
+
+  for (const id of ids) {
+    blacklist.bans = blacklist.bans.filter(b => b.split(':')[0].toLowerCase() !== id);
+    if (!blacklist.unbans.includes(id)) {
+      blacklist.unbans.push(id);
+    }
+  }
+
+  try {
+    await saveBlacklist();
+    renderBlacklist();
+    toast('Unbanned: ' + ids.join(', '), 'success');
+  } catch(e) {
+    toast('Failed to save blacklist', 'error');
+  }
+}
+
+async function manualBan() {
+  const input = document.getElementById('manual-id');
+  const duration = document.getElementById('manual-duration');
+  const id = input.value.trim().toLowerCase();
+  if (!id) { toast('Enter a PC name or HWID', 'error'); return; }
+  const dur = duration.value;
+  const suffix = dur === '0' ? '' : ':' + dur + 'h';
+  const entry = id + suffix;
+
+  if (!blacklist.bans.includes(entry)) {
+    blacklist.bans.push(entry);
+  }
+  blacklist.unbans = blacklist.unbans.filter(u => u.toLowerCase() !== id);
+
+  try {
+    await saveBlacklist();
+    renderBlacklist();
+    input.value = '';
+    toast('Banned: ' + entry || id, 'success');
+  } catch(e) {
+    toast('Failed to save blacklist', 'error');
+  }
+}
+
+async function removeBan(entry) {
+  if (!confirm('Remove ban: ' + entry + '?')) return;
+  blacklist.bans = blacklist.bans.filter(b => b !== entry);
+  try {
+    await saveBlacklist();
+    renderBlacklist();
+    toast('Removed: ' + entry, 'success');
+  } catch(e) {
+    toast('Failed to save blacklist', 'error');
+  }
+}
+
+async function addUnban(id) {
+  const clean = id.split(':')[0].toLowerCase();
+  if (!clean) return;
+  blacklist.bans = blacklist.bans.filter(b => b.split(':')[0].toLowerCase() !== clean);
+  if (!blacklist.unbans.includes(clean)) {
+    blacklist.unbans.push(clean);
+  }
+  try {
+    await saveBlacklist();
+    renderBlacklist();
+    toast('Unbanned: ' + clean, 'success');
+  } catch(e) {
+    toast('Failed to save blacklist', 'error');
+  }
+}
+
+function renderBlacklist() {
+  const tbody = document.getElementById('banlist-body');
+  document.getElementById('banlist').style.display = 'block';
+  const all = [];
+
+  for (const b of blacklist.bans) {
+    const parts = b.split(':');
+    const id = parts[0];
+    const dur = parts.slice(1).join(':');
+    let label, cls;
+    if (!dur) { label = 'Permanent'; cls = 'tag-perm'; }
+    else { label = dur; cls = 'tag-time'; }
+    all.push({ id, duration: label, source: 'Gist', cls, entry: b });
+  }
+
+  for (const u of blacklist.unbans) {
+    all.push({ id: u, duration: 'Unbanned', source: 'Gist (unban)', cls: 'tag-unban', entry: null });
+  }
+
+  if (all.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#686880;padding:20px">No entries</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = all.map(item => {
+    let actionBtn = '';
+    if (item.entry) {
+      actionBtn = '<button class="btn-unban" style="padding:3px 10px;font-size:11px" onclick="removeBan(\'' + esc(item.entry) + '\')">Remove</button>';
+    } else {
+      actionBtn = '<button class="btn-ban" style="padding:3px 10px;font-size:11px" onclick="addUnban(\'' + esc(item.id) + '\')">Remove Unban</button>';
+    }
+    return '<tr>' +
+      '<td><span style="font-family:monospace;font-size:12px">' + esc(item.id) + '</span></td>' +
+      '<td><span class="' + item.cls + '">' + esc(item.duration) + '</span></td>' +
+      '<td>' + esc(item.source) + '</td>' +
+      '<td>' + actionBtn + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+let toastTimeout;
+
+function toast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || 'info');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
+}
+
+document.getElementById('pw-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') login();
+});
+
+document.getElementById('manual-id').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') manualBan();
+});
+</script>
+</body>
+</html>
