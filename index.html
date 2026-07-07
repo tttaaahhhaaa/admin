@@ -3,80 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel - SteamToolsLua</title>
+<title>Admin Panel - SteamToolsLua v2.2.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a10;color:#d0d0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
-#login{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:10px;padding:20px}
-#login h1{font-size:20px;color:#b088ff;font-weight:600}
-#login p{color:#686880;font-size:13px;margin-bottom:6px}
-#login input{padding:10px 14px;border-radius:6px;border:1px solid #2a2a4a;background:#12121e;color:#d0d0e0;font-size:14px;width:270px;outline:none}
-#login input:focus{border-color:#7c6fff}
-#login button{padding:10px;border-radius:6px;border:none;background:#7c6fff;color:#fff;font-size:14px;cursor:pointer;width:270px;font-weight:500}
-#login button:hover{background:#6a5ee8}
-#login .err{color:#f56565;font-size:13px;display:none}
+body{background:#08080e;color:#d0d0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px}
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:10px;padding:20px;background:radial-gradient(ellipse at center,#0f0f20,#08080e)}
+#login h1{font-size:22px;color:#b088ff;font-weight:700;letter-spacing:-.5px}
+#login p{color:#585880;font-size:13px;margin-bottom:6px}
+#login input{padding:10px 14px;border-radius:8px;border:1px solid #2a2a4a;background:#10101e;color:#d0d0e0;font-size:14px;width:280px;outline:none;transition:border-color .2s}
+#login input:focus{border-color:#7c6fff;box-shadow:0 0 0 3px #7c6fff20}
+#login button{padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#7c6fff,#6a5ee8);color:#fff;font-size:14px;cursor:pointer;width:280px;font-weight:600;transition:opacity .2s}
+#login button:hover{opacity:.9}
+#login .err{color:#f56565;font-size:13px;display:none;background:#f5656510;padding:6px 14px;border-radius:6px;border:1px solid #f5656530}
 #app{display:none;height:100vh;flex-direction:column}
-.top{background:#0f0f1a;border-bottom:1px solid #1e1e3a;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.top h1{font-size:15px;color:#b088ff;font-weight:600}
-.top .inf{color:#686880;font-size:12px}
-.top .r{display:flex;gap:8px;align-items:center}
-.top .r button{padding:5px 12px;border-radius:4px;border:1px solid #2a2a4a;background:transparent;color:#888;font-size:12px;cursor:pointer}
-.top .r button:hover{color:#d0d0e0;border-color:#7c6fff}
+.top{background:#0c0c18;border-bottom:1px solid #1a1a30;padding:8px 20px;display:flex;align-items:center;flex-shrink:0;gap:12px}
+.top h1{font-size:14px;color:#b088ff;font-weight:700}
+.top .badge{font-size:10px;color:#585880;background:#1a1a30;padding:2px 8px;border-radius:4px}
+.top .inf{color:#686880;font-size:12px;flex:1}
+.top .r{display:flex;gap:6px}
+.top .r button{padding:5px 12px;border-radius:5px;border:1px solid #2a2a4a;background:transparent;color:#8888a0;font-size:11px;cursor:pointer;transition:all .15s}
+.top .r button:hover{color:#d0d0e0;border-color:#7c6fff;background:#7c6fff10}
 .body{display:flex;flex:1;overflow:hidden}
-.side{width:280px;background:#0d0d18;border-right:1px solid #1a1a30;display:flex;flex-direction:column;flex-shrink:0}
+.side{width:300px;background:#0a0a14;border-right:1px solid #1a1a30;display:flex;flex-direction:column;flex-shrink:0}
 .side .sh{padding:10px 12px 6px;display:flex;justify-content:space-between;align-items:center}
-.side .sh h3{font-size:11px;color:#7c6fff;text-transform:uppercase;letter-spacing:1px;font-weight:600}
-.side .sh input{padding:4px 8px;border-radius:4px;border:1px solid #2a2a4a;background:#12121e;color:#d0d0e0;font-size:12px;outline:none;width:120px}
+.side .sh h3{font-size:10px;color:#7c6fff;text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+.side .sh input{padding:4px 8px;border-radius:5px;border:1px solid #2a2a4a;background:#10101e;color:#d0d0e0;font-size:11px;outline:none;width:110px;transition:border-color .2s}
 .side .sh input:focus{border-color:#7c6fff}
 #devlist{flex:1;overflow-y:auto;padding:4px 8px}
-.di{padding:7px 10px;border-radius:4px;cursor:pointer;margin-bottom:1px;border:1px solid transparent}
-.di:hover{background:#141428;border-color:#2a2a4a}
-.di.sel{background:#1a1a35;border-color:#7c6fff}
-.di .n{font-size:13px;color:#d0d0e0;display:flex;justify-content:space-between}
-.di .n .b{font-size:10px;color:#f56565;background:#f5656515;padding:0 5px;border-radius:3px}
-.di .m{font-size:11px;color:#585878;margin-top:2px}
+.di{padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;border:1px solid transparent;transition:all .12s}
+.di:hover{background:#12122a;border-color:#2a2a4a}
+.di.sel{background:#181838;border-color:#7c6fff}
+.di .n{font-size:13px;color:#d0d0e0;display:flex;justify-content:space-between;align-items:center;gap:4px}
+.di .n .pc{font-weight:600}
+.di .n .un{font-size:11px;color:#7c6fff}
+.di .n .b{font-size:9px;color:#f56565;background:#f5656518;padding:1px 5px;border-radius:3px;font-weight:700;text-transform:uppercase}
+.di .n .x{font-size:10px;color:#585880;white-space:nowrap}
+.di .m{font-size:10px;color:#585880;margin-top:3px;display:flex;gap:6px}
 .man{padding:10px 12px;border-top:1px solid #1a1a30;flex-shrink:0}
-.man h3{font-size:11px;color:#7c6fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600}
-.man .r{display:flex;gap:5px;flex-wrap:wrap}
-.man input{padding:5px 8px;border-radius:4px;border:1px solid #2a2a4a;background:#12121e;color:#d0d0e0;font-size:12px;outline:none;min-width:0}
+.man h3{font-size:10px;color:#7c6fff;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:700}
+.man .r{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.man input{padding:5px 8px;border-radius:5px;border:1px solid #2a2a4a;background:#10101e;color:#d0d0e0;font-size:11px;outline:none;min-width:0}
 .man input:focus{border-color:#7c6fff}
-.man select{padding:5px;border-radius:4px;border:1px solid #2a2a4a;background:#12121e;color:#d0d0e0;font-size:12px}
-.man button{padding:5px 12px;border-radius:4px;border:none;background:#f56565;color:#fff;font-size:12px;cursor:pointer;white-space:nowrap}
-.main{flex:1;padding:20px;overflow-y:auto}
-.main .p{background:#0f0f1a;border:1px solid #1a1a30;border-radius:8px;padding:20px;margin-bottom:14px}
-.main .p .i{display:flex;margin-bottom:5px;font-size:13px}
-.main .p .i .l{color:#686880;width:80px;flex-shrink:0}
-.main .p .i .v{color:#d0d0e0;word-break:break-all}
-.main .p .i .v.m{font-family:'SF Mono','Cascadia Code',monospace;font-size:12px}
-.main .p .a{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center}
-.main .p .a input[type=number]{padding:5px 6px;border-radius:4px;border:1px solid #2a2a4a;background:#12121e;color:#d0d0e0;font-size:12px;outline:none;width:55px;text-align:center}
-.main .p .a input[type=number]:focus{border-color:#7c6fff}
-.main .p .a select{padding:5px 6px;border-radius:4px;border:1px solid #2a2a4a;background:#12121e;color:#d0d0e0;font-size:12px}
-.main .p .a button{padding:6px 14px;border-radius:4px;border:none;font-size:12px;cursor:pointer;font-weight:500}
-.main .p .a .del2{background:#8b0000;color:#fff}.del2:hover{background:#aa0000}
-.main .p .a label{font-size:12px;color:#686880;display:flex;align-items:center;gap:3px;cursor:pointer}
-.main .p .a input[type=checkbox]{accent-color:#7c6fff;cursor:pointer}
-.times{font-size:11px;color:#585878;margin-top:8px;max-height:150px;overflow-y:auto}
-.times div{padding:2px 0;border-bottom:1px solid #141428}
-.loc{font-size:12px;color:#48bb78}
-.bb{background:#f56565;color:#fff}.bb:hover{background:#e05050}
-.bu{background:#48bb78;color:#fff}.bu:hover{background:#3ca868}
-.tbl{margin-top:4px}
+.man select{padding:5px;border-radius:5px;border:1px solid #2a2a4a;background:#10101e;color:#d0d0e0;font-size:11px}
+.man label{font-size:10px;color:#686880;display:flex;align-items:center;gap:2px;cursor:pointer}
+.man button{padding:5px 12px;border-radius:5px;border:none;background:#f56565;color:#fff;font-size:11px;cursor:pointer;white-space:nowrap;font-weight:600;transition:opacity .2s}
+.man button:hover{opacity:.85}
+.main{flex:1;padding:16px 20px;overflow-y:auto;background:#08080e}
+.card{background:#0c0c18;border:1px solid #1a1a30;border-radius:10px;padding:20px;margin-bottom:14px}
+.card .i{display:flex;margin-bottom:4px;font-size:13px}
+.card .i .l{color:#585880;width:80px;flex-shrink:0}
+.card .i .v{color:#d0d0e0;word-break:break-all}
+.card .i .v.m{font-family:'SF Mono','Cascadia Code',monospace;font-size:12px}
+.card .i .v .tag{font-size:10px;color:#7c6fff;background:#7c6fff15;padding:1px 6px;border-radius:3px;margin-left:6px}
+.card .a{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.card .a input[type=number]{padding:5px 6px;border-radius:5px;border:1px solid #2a2a4a;background:#10101e;color:#d0d0e0;font-size:12px;outline:none;width:50px;text-align:center}
+.card .a input[type=number]:focus{border-color:#7c6fff}
+.card .a select{padding:5px 6px;border-radius:5px;border:1px solid #2a2a4a;background:#10101e;color:#d0d0e0;font-size:12px}
+.card .a button{padding:6px 14px;border-radius:6px;border:none;font-size:12px;cursor:pointer;font-weight:600;transition:opacity .2s}
+.card .a button:hover{opacity:.85}
+.card .a .del2{background:#8b0000;color:#fff}
+.card .a label{font-size:11px;color:#686880;display:flex;align-items:center;gap:3px;cursor:pointer}
+.card .a input[type=checkbox]{accent-color:#7c6fff;cursor:pointer}
+.times{border-top:1px solid #1a1a30;padding-top:10px;margin-top:10px}
+.times b{font-size:11px;color:#585880}
+.times div{padding:3px 0;font-size:11px;color:#686880;border-bottom:1px solid #12122a;font-family:'SF Mono',monospace}
+.times .scroll{max-height:140px;overflow-y:auto;margin-top:4px}
+.locinfo{font-size:12px;color:#48bb78;padding:2px 0}
+.bb{background:#f56565;color:#fff}
+.bu{background:#48bb78;color:#fff}
+.tbl{margin-top:6px}
 .tbl table{width:100%;border-collapse:collapse;font-size:12px}
-.tbl th{text-align:left;padding:6px 8px;border-bottom:2px solid #1a1a30;color:#7c6fff;font-weight:600;font-size:11px;text-transform:uppercase}
-.tbl td{padding:6px 8px;border-bottom:1px solid #141428}
-.tbl tr:hover td{background:#0d0d18}
-.tbl .del{padding:2px 8px;border-radius:3px;border:none;cursor:pointer;font-size:11px}
-.empty{text-align:center;color:#585878;padding:60px 20px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.empty .ic{font-size:40px;margin-bottom:10px;opacity:.3}
+.tbl th{text-align:left;padding:6px 8px;border-bottom:2px solid #1a1a30;color:#7c6fff;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.tbl td{padding:6px 8px;border-bottom:1px solid #12122a;font-size:12px}
+.tbl tr:hover td{background:#0a0a18}
+.tbl .del{padding:2px 8px;border-radius:4px;border:none;cursor:pointer;font-size:10px;font-weight:600}
+.empty{text-align:center;color:#585880;padding:60px 20px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.empty .ic{font-size:36px;margin-bottom:10px;opacity:.3}
+.empty p{font-size:13px;color:#585880}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid #2a2a4a;border-top-color:#7c6fff;border-radius:50%;animation:s .6s linear infinite;vertical-align:middle}
 @keyframes s{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:6px;color:#fff;font-size:13px;z-index:999;animation:f .3s;max-width:350px}
-.toast.s{background:#48bb78}.toast.e{background:#f56565}.toast.i{background:#7c6fff}
+.toast{position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:8px;color:#fff;font-size:13px;z-index:999;animation:f .25s;max-width:360px;backdrop-filter:blur(8px);box-shadow:0 4px 20px #00000060}
+.toast.s{background:#48bb78e0}.toast.e{background:#f56565e0}.toast.i{background:#7c6fffe0}
 @keyframes f{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 ::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:#0a0a10}
+::-webkit-scrollbar-track{background:#08080e}
 ::-webkit-scrollbar-thumb{background:#2a2a4a;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#3a3a5a}
+.cp{cursor:pointer;transition:color .15s}.cp:hover{color:#7c6fff}
 </style>
 </head>
 <body>
@@ -91,11 +104,12 @@ body{background:#0a0a10;color:#d0d0e0;font-family:-apple-system,BlinkMacSystemFo
 
 <div id="app">
   <div class="top">
-    <div><h1>Admin Panel</h1></div>
+    <h1>Admin Panel</h1>
+    <span class="badge">v2.2.0</span>
     <div class="inf" id="info">Loading...</div>
     <div class="r">
       <button onclick="load()">&#x21bb; Refresh</button>
-      <button onclick="document.getElementById('app').style.display='none';document.getElementById('login').style.display='flex';document.getElementById('pw').value='';document.getElementById('l_err').style.display='none'">Logout</button>
+      <button onclick="logout()">Logout</button>
     </div>
   </div>
   <div class="body">
@@ -108,10 +122,10 @@ body{background:#0a0a10;color:#d0d0e0;font-family:-apple-system,BlinkMacSystemFo
       <div class="man">
         <h3>Manual Ban</h3>
         <div class="r">
-          <input id="mid" placeholder="PC name or HWID" style="flex:1;min-width:80px">
-          <input type="number" id="mdn" value="24" min="1" style="width:50px">
-          <select id="mdu"><option value="m">dk</option><option value="h" selected>sa</option><option value="d">gün</option></select>
-          <label style="font-size:11px;color:#686880;display:flex;align-items:center;gap:2px"><input type="checkbox" id="mdperm"> srsz</label>
+          <input id="mid" placeholder="PC name or HWID" style="flex:2;min-width:60px">
+          <input type="number" id="mdn" value="24" min="1" style="width:44px">
+          <select id="mdu"><option value="m">dk</option><option value="h" selected>sa</option><option value="d">gn</option></select>
+          <label><input type="checkbox" id="mdperm"> srsz</label>
           <button onclick="mban()">Ban</button>
         </div>
       </div>
@@ -119,8 +133,8 @@ body{background:#0a0a10;color:#d0d0e0;font-family:-apple-system,BlinkMacSystemFo
     <div class="main">
       <div id="detail"></div>
       <div id="blist" style="display:none">
-        <div class="p" style="padding:12px 16px"><h2 style="font-size:14px;color:#b088ff">Blacklist</h2></div>
-        <div class="tbl"><table><thead><tr><th>Identifier</th><th>Duration</th><th>Expiry / Remaining</th><th></th></tr></thead><tbody id="blbody"></tbody></table></div>
+        <div class="card"><h3 style="font-size:12px;color:#b088ff;font-weight:700;margin-bottom:10px">Blacklist</h3>
+        <div class="tbl"><table><thead><tr><th>Identifier</th><th>Duration</th><th>Status</th><th></th></tr></thead><tbody id="blbody"></tbody></table></div></div>
       </div>
     </div>
   </div>
@@ -133,16 +147,24 @@ const _t = 'github_pat_11BOBFHHQ0gJPQnX00BuTU_SQu4ULpKLzSJU86SduIXgchRNa8YdW1RjV
 const _api = 'https://api.github.com/gists/' + _gist;
 
 let T = '', devices = [], bl = {bans:[],unbans:[]}, selKey = '';
+let banCache = {};
 
 function h() { return {Authorization:'token '+T,'User-Agent':'AP','Accept':'application/vnd.github.v3+json'} }
 
 function go() {
   if (btoa(document.getElementById('pw').value)===_pw) { T=_t; document.getElementById('login').style.display='none'; document.getElementById('app').style.display='flex'; load() }
-  else document.getElementById('l_err').style.display='block'
+  else { document.getElementById('l_err').style.display='block'; setTimeout(()=>document.getElementById('l_err').style.display='none',3000) }
+}
+
+function logout() {
+  document.getElementById('app').style.display='none';
+  document.getElementById('login').style.display='flex';
+  document.getElementById('pw').value='';
+  document.getElementById('l_err').style.display='none'
 }
 
 async function load() {
-  document.getElementById('devlist').innerHTML='<div style="text-align:center;padding:20px;color:#585878"><div class="spin"></div></div>';
+  document.getElementById('devlist').innerHTML='<div style="text-align:center;padding:30px;color:#585878"><div class="spin"></div></div>';
   document.getElementById('detail').innerHTML='<div class="empty"><div class="ic">&#128187;</div><p>Select a device</p></div>';
   try {
     const r = await fetch(_api, {headers:h()});
@@ -154,16 +176,68 @@ async function load() {
     if(!Array.isArray(devices)) devices=[];
     const bf = fc['blacklist.json'];
     if(bf&&bf.content) { bl=JSON.parse(bf.content); if(!bl.bans) bl.bans=[]; if(!bl.unbans) bl.unbans=[] }
-    else bl={bans:[],unbans:[]}
-  } catch(e) { devices=[]; bl={bans:[],unbans:[]} }
+    else bl={bans:[],unbans:[]};
+    // rebuild ban cache
+    banCache = {};
+    for (const b of bl.bans) {
+      const p = b.split(':')[0].toLowerCase();
+      banCache[p] = parseBan(b);
+    }
+  } catch(e) { devices=[]; bl={bans:[],unbans:[]}; banCache={} }
   render(); renderBl()
+}
+
+function parseBan(b) {
+  const p = b.split(':');
+  const id = p[0];
+  if (p.length <= 2) return {id, active:true, perm:true, remaining:null, durTxt:'Permanent'};
+  const dur = p[p.length-1];
+  const ts = p.slice(1, -1).join(':');
+  const now = Date.now();
+  try {
+    let start;
+    if (ts.indexOf('-') === -1) {
+      const y=ts.substr(0,4),mo=ts.substr(4,2),d=ts.substr(6,2),h=ts.substr(9,2),mi=ts.substr(11,2),s=ts.substr(13,2);
+      start = Date.UTC(+y,+mo-1,+d,+h,+mi,+s);
+    } else {
+      start = new Date(ts).getTime();
+    }
+    if (isNaN(start)) return {id, active:true, perm:true, remaining:null, durTxt:'Permanent'};
+    let secs = 0;
+    const u = dur.slice(-1);
+    const n = parseInt(dur);
+    if (u==='m') secs = n*60;
+    else if (u==='h') secs = n*3600;
+    else if (u==='d') secs = n*86400;
+    else return {id, active:true, perm:true, remaining:null, durTxt:'Permanent'};
+    const end = start + secs*1000;
+    const rem = Math.floor((end - now)/1000);
+    const active = rem > 0;
+    return {id, active, perm:false, remaining:active?rem:0, durTxt: dur};
+  } catch(e) { return {id, active:true, perm:true, remaining:null, durTxt:'Permanent'} }
 }
 
 function bId(id) {
   if(!id) return false;
   const l=id.toLowerCase();
   if(bl.unbans.includes(l)) return false;
-  return bl.bans.some(b=>b.split(':')[0].toLowerCase()===l)
+  const c = banCache[l];
+  if (!c) return false;
+  return c.active;
+}
+
+function activeBans() {
+  let n = 0;
+  const seen = new Set();
+  for (const b of bl.bans) {
+    const id = b.split(':')[0].toLowerCase();
+    if (bl.unbans.includes(id)) continue;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const c = banCache[id];
+    if (c && c.active) n++;
+  }
+  return n;
 }
 
 function groupDevs(arr) {
@@ -186,7 +260,7 @@ function render() {
   const el=document.getElementById('devlist');
   const q=document.getElementById('q').value.toLowerCase().trim();
   const groups = groupDevs(devices);
-  if(!groups.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:#585878;font-size:13px">No devices</div>'; info(); return }
+  if(!groups.length) { el.innerHTML='<div style="text-align:center;padding:30px;color:#585878;font-size:13px">No devices</div>'; info(); return }
   const f = q ? groups.filter(g => {
     const d = g.latest;
     return (d.pc&&d.pc.toLowerCase().includes(q))||(d.hwid&&d.hwid.toLowerCase().includes(q))||
@@ -194,33 +268,31 @@ function render() {
            (d.lastname&&d.lastname.toLowerCase().includes(q))||
            (d.nickname&&d.nickname.toLowerCase().includes(q));
   }) : groups;
-  if(!f.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:#585878;font-size:13px">No match</div>'; info(); return }
+  if(!f.length) { el.innerHTML='<div style="text-align:center;padding:30px;color:#585878;font-size:13px">No match</div>'; info(); return }
   el.innerHTML=f.map(g => {
     const d = g.latest;
     const a = g.key===selKey?' sel':'';
     const bb = bId(d.pc)||bId(d.hwid);
-    const nm = d.pc||'?';
-    const un = (d.firstname||d.lastname) ? (d.firstname||'')+' '+(d.lastname||'') : '';
-    const nn = d.nickname ? '@'+d.nickname : '';
-    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span>'+esc(nm)+(un?' <span style="font-size:11px;color:#7c6fff">'+esc(un)+'</span>':'')+(bb?' <span class="b">BANNED</span>':'')+'</span><span style="font-size:10px;color:#585878">'+g.entries.length+'x</span></div><div class="m">'+esc(nn)+(d.hwid?' &middot; '+d.hwid.substring(0,8)+'...':'')+'</div></div>'
+    const un = (d.firstname||d.lastname) ? '<span class="un">'+(d.firstname||'')+' '+(d.lastname||'')+'</span>' : '';
+    const nn = d.nickname ? ' @'+d.nickname : '';
+    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span class="pc">'+esc(d.pc||'?')+'</span>'+un+(bb?'<span class="b">BANNED</span>':'')+'<span class="x">'+g.entries.length+'x</span></div><div class="m"><span>'+esc(nn)+'</span>'+(d.hwid?'<span style="color:#585880">'+d.hwid.substring(0,8)+'</span>':'')+'</div></div>'
   }).join('');
   info()
 }
 
 function info() {
-  let bc=0;
-  for(const b of bl.bans){const id=b.split(':')[0].toLowerCase();if(!bl.unbans.includes(id)) bc++}
+  const bc = activeBans();
   const groups = groupDevs(devices);
-  document.getElementById('info').textContent=groups.length+' unique | '+devices.length+' total | '+bc+' banned'
+  document.getElementById('info').textContent=groups.length+' unique | '+devices.length+' total | '+bc+' active ban'+(bc!==1?'s':'')
 }
 
 async function getLocation(ip) {
   try {
-    const r = await fetch('http://ip-api.com/json/'+ip+'?fields=country,city,isp');
+    const r = await fetch('http://ip-api.com/json/'+ip+'?fields=status,country,city,isp');
     if (!r.ok) return '';
     const d = await r.json();
     if (d.status==='fail') return '';
-    return (d.country||'') + (d.city?', '+d.city:'') + (d.isp?' ('+d.isp+')':'');
+    return [d.country||'', d.city||'', d.isp||''].filter(Boolean).join(' \u279C ');
   } catch(e) { return '' }
 }
 
@@ -232,27 +304,25 @@ function selGroup(key) {
   const el = document.getElementById('detail');
   document.getElementById('blist').style.display='block';
   const bb = bId(d.pc)||bId(d.hwid);
-  const un = (d.firstname||d.lastname) ? ('<div class="i"><div class="l">Ad Soyad</div><div class="v">'+esc((d.firstname||'')+' '+(d.lastname||''))+'</div></div>') : '';
-  const nn = d.nickname ? ('<div class="i"><div class="l">Nickname</div><div class="v">@'+esc(d.nickname)+'</div></div>') : '';
-  el.innerHTML='<div class="p"><h2 style="font-size:15px;color:#b088ff;margin-bottom:10px">'+esc(d.pc||'?')+(bb?' <span style="font-size:11px;color:#f56565;background:#f5656515;padding:1px 6px;border-radius:3px">BANNED</span>':'')+' <span class="loc" id="locspan">&#8987;</span></h2>'+
+  const un = (d.firstname||d.lastname) ? '<div class="i"><div class="l">Ad Soyad</div><div class="v">'+esc((d.firstname||'')+' '+(d.lastname||''))+' <span class="tag">verified</span></div></div>' : '';
+  const nn = d.nickname ? '<div class="i"><div class="l">Nickname</div><div class="v">@'+esc(d.nickname)+'</div></div>' : '';
+  el.innerHTML='<div class="card"><h3 style="font-size:16px;color:#b088ff;margin-bottom:12px;font-weight:700">'+esc(d.pc||'?')+(bb?' <span style="font-size:11px;color:#f56565;background:#f5656518;padding:1px 8px;border-radius:4px;font-weight:700">BANNED</span>':'')+' <span style="font-size:12px;color:#585880;font-weight:400" id="locspan"></span></h3>'+
     un+nn+
     '<div class="i"><div class="l">PC Name</div><div class="v m">'+esc(d.pc||'-')+'</div></div>'+
     '<div class="i"><div class="l">HWID</div><div class="v m" style="font-size:11px">'+esc(d.hwid||'-')+'</div></div>'+
     '<div class="i"><div class="l">IP</div><div class="v m" id="iploc">'+esc(d.ip||'-')+'</div></div>'+
-    (g.entries.length>1?'<div class="times"><b>Login Times ('+g.entries.length+'):</b>'+g.entries.map(e => '<div>'+(e.time?new Date(e.time).toLocaleString():'-')+'</div>').join('')+'</div>':'')+
+    (g.entries.length>1?'<div class="times"><b>Login Times ('+g.entries.length+'):</b><div class="scroll">'+g.entries.map(e => '<div>'+(e.time?new Date(e.time).toLocaleString():'-')+'</div>').join('')+'</div></div>':'')+
     '<div class="a">'+
     '<input type="number" id="bdn" value="24" min="1">'+
-    '<select id="bdu"><option value="m">dk</option><option value="h" selected>sa</option><option value="d">gün</option></select>'+
-    '<label><input type="checkbox" id="bdperm"> süresiz</label>'+
+    '<select id="bdu"><option value="m">dk</option><option value="h" selected>sa</option><option value="d">gn</option></select>'+
+    '<label><input type="checkbox" id="bdperm"> suresiz</label>'+
     '<button class="bb" onclick="bGroup(\''+key+'\')">Ban All</button>'+
     '<button class="bu" onclick="uGroup(\''+key+'\')">Unban All</button>'+
     '<button class="del2" onclick="delGroup(\''+key+'\')">Sil</button></div></div>';
   if (d.ip && d.ip !== 'unknown') {
     getLocation(d.ip).then(loc => {
-      const ipEl = document.getElementById('iploc');
       const ls = document.getElementById('locspan');
-      if (ls) ls.textContent = loc ? '\u{1F30D}' : '';
-      if (ipEl && loc) ipEl.textContent = d.ip + ' \u279C ' + loc;
+      if (ls) ls.textContent = loc ? '\u{1F30D} '+loc : '';
     });
   }
 }
@@ -287,6 +357,7 @@ async function uGroup(key) {
   const g = groupDevs(devices).find(x=>x.key===key); if(!g)return;
   const ids=getGroupIds(g); if(!ids.length){toast('No ID','e');return}
   for(const id of ids){bl.bans=bl.bans.filter(b=>b.split(':')[0].toLowerCase()!==id);if(!bl.unbans.includes(id))bl.unbans.push(id)}
+  banCache={};for(const b of bl.bans){const p=b.split(':')[0].toLowerCase();banCache[p]=parseBan(b)}
   try{await saveBl();renderBl();render();selGroup(key);toast('Unbanned: '+ids.join(', '),'s')}catch(e){toast('Save failed','e')}
 }
 
@@ -319,42 +390,21 @@ async function mban(){
   }
   if(!bl.bans.includes(e))bl.bans.push(e);
   bl.unbans=bl.unbans.filter(u=>u!==id);
+  banCache[id]=parseBan(e);
   try{await saveBl();renderBl();render();inp.value='';toast('Banned: '+e,'s')}catch(e2){toast('Save failed','e')}
 }
 
-async function rBan(entry){bl.bans=bl.bans.filter(b=>b!==entry);try{await saveBl();renderBl();render();toast('Removed: '+entry.split(':')[0],'s')}catch(e){toast('Failed','e')}}
-async function rUnban(id){bl.unbans=bl.unbans.filter(u=>u!==id);try{await saveBl();renderBl();toast('Unban removed: '+id,'s')}catch(e){toast('Failed','e')}}
-async function saveBl(){await fetch(_api,{method:'PATCH',headers:h(),body:JSON.stringify({files:{'blacklist.json':{content:JSON.stringify(bl,null,2)}}})})}
-
-function parseBan(b) {
-  const p = b.split(':');
-  const id = p[0];
-  if (p.length === 1) return {id, perm:true, remaining:null, durTxt:''};
-  if (p.length === 2) return {id, perm:true, remaining:null, durTxt:''};
-  const dur = p[p.length-1];
-  const ts = p.slice(1, -1).join(':');
-  const now = Date.now();
-  try {
-    let start;
-    if (ts.indexOf('-') === -1) {
-      const y=ts.substr(0,4),mo=ts.substr(4,2),d=ts.substr(6,2),h=ts.substr(9,2),mi=ts.substr(11,2),s=ts.substr(13,2);
-      start = Date.UTC(+y,+mo-1,+d,+h,+mi,+s);
-    } else {
-      start = new Date(ts).getTime();
-    }
-    if (isNaN(start)) return {id, perm:true, remaining:null, durTxt:''};
-    let secs = 0;
-    const u = dur.slice(-1);
-    const n = parseInt(dur);
-    if (u==='m') secs = n*60;
-    else if (u==='h') secs = n*3600;
-    else if (u==='d') secs = n*86400;
-    else return {id, perm:true, remaining:null, durTxt:''};
-    const end = start + secs*1000;
-    const rem = Math.floor((end - now)/1000);
-    return {id, perm:false, remaining:rem>0?rem:0, durTxt: dur};
-  } catch(e) { return {id, perm:true, remaining:null, durTxt:''} }
+async function rBan(entry){
+  const id=entry.split(':')[0].toLowerCase();
+  bl.bans=bl.bans.filter(b=>b!==entry);
+  delete banCache[id];
+  try{await saveBl();renderBl();render();toast('Removed: '+id,'s')}catch(e){toast('Failed','e')}
 }
+async function rUnban(id){
+  bl.unbans=bl.unbans.filter(u=>u!==id);
+  try{await saveBl();renderBl();toast('Unban removed: '+id,'s')}catch(e){toast('Failed','e')}
+}
+async function saveBl(){await fetch(_api,{method:'PATCH',headers:h(),body:JSON.stringify({files:{'blacklist.json':{content:JSON.stringify(bl,null,2)}}})})}
 
 function renderBl(){
   document.getElementById('blist').style.display='block';
@@ -362,23 +412,24 @@ function renderBl(){
   const rows=[];
   for(const b of bl.bans){
     const p = parseBan(b);
-    let durText, remText;
+    let durText, statusText;
     if (p.perm) {
       durText = '<span style="color:#f56565">Permanent</span>';
-      remText = '';
-    } else if (p.remaining <= 0) {
+      statusText = '<span style="color:#f56565">Aktif</span>';
+    } else if (!p.active) {
       durText = '<span style="color:#686880">'+esc(p.durTxt)+'</span>';
-      remText = '<span style="color:#48bb78">Süresi doldu</span>';
+      statusText = '<span style="color:#48bb78">Suresi doldu</span>';
     } else {
+      durText = '<span style="color:#e8a050">'+esc(p.durTxt)+'</span>';
       const h = Math.floor(p.remaining / 3600);
       const m = Math.floor((p.remaining % 3600) / 60);
-      durText = '<span style="color:#e8a050">'+esc(p.durTxt)+'</span>';
-      remText = '<span style="color:#48bb78">'+(h>0?h+'s ':'')+m+'dk kaldı</span>';
+      const s = p.remaining % 60;
+      statusText = '<span style="color:#f56565">'+(h>0?h+'s ':'')+m+'dk '+s+'sn</span>';
     }
-    rows.push('<tr><td><span style="font-family:monospace;font-size:12px">'+esc(p.id)+'</span></td><td>'+durText+'</td><td>'+remText+'</td><td><button class="bu del" onclick="rBan(\''+esc(b)+'\')">Remove</button></td></tr>');
+    rows.push('<tr><td><span style="font-family:monospace;font-size:12px">'+esc(p.id)+'</span></td><td>'+durText+'</td><td>'+statusText+'</td><td><button class="bu del" onclick="rBan(\''+esc(b)+'\')">Kaldir</button></td></tr>');
   }
-  for(const u of bl.unbans)rows.push('<tr><td><span style="font-family:monospace;font-size:12px;color:#686880">'+esc(u)+'</span></td><td><span style="color:#686880">Unbanned</span></td><td></td><td><button class="del" style="background:#585878;color:#fff" onclick="rUnban(\''+esc(u)+'\')">Remove</button></td></tr>');
-  t.innerHTML=rows.length?rows.join(''):'<tr><td colspan="4" style="text-align:center;color:#585878;padding:16px">No entries</td></tr>'
+  for(const u of bl.unbans)rows.push('<tr><td><span style="font-family:monospace;font-size:12px;color:#585880">'+esc(u)+'</span></td><td><span style="color:#585880">Unbanned</span></td><td></td><td><button class="del" style="background:#585878;color:#fff" onclick="rUnban(\''+esc(u)+'\')">Kaldir</button></td></tr>');
+  t.innerHTML=rows.length?rows.join(''):'<tr><td colspan="4" style="text-align:center;color:#585878;padding:20px">No entries</td></tr>'
 }
 
 function esc(s){if(!s)return '';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
