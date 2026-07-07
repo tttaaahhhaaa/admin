@@ -189,14 +189,20 @@ function render() {
   if(!groups.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:#585878;font-size:13px">No devices</div>'; info(); return }
   const f = q ? groups.filter(g => {
     const d = g.latest;
-    return (d.pc&&d.pc.toLowerCase().includes(q))||(d.hwid&&d.hwid.toLowerCase().includes(q));
+    return (d.pc&&d.pc.toLowerCase().includes(q))||(d.hwid&&d.hwid.toLowerCase().includes(q))||
+           (d.firstname&&d.firstname.toLowerCase().includes(q))||
+           (d.lastname&&d.lastname.toLowerCase().includes(q))||
+           (d.nickname&&d.nickname.toLowerCase().includes(q));
   }) : groups;
   if(!f.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:#585878;font-size:13px">No match</div>'; info(); return }
   el.innerHTML=f.map(g => {
     const d = g.latest;
     const a = g.key===selKey?' sel':'';
     const bb = bId(d.pc)||bId(d.hwid);
-    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span>'+esc(d.pc||'?')+(bb?' <span class="b">BANNED</span>':'')+'</span><span style="font-size:10px;color:#585878">'+g.entries.length+'x</span></div><div class="m">'+(d.hwid?d.hwid.substring(0,8)+'...':'')+'</div></div>'
+    const nm = d.pc||'?';
+    const un = (d.firstname||d.lastname) ? (d.firstname||'')+' '+(d.lastname||'') : '';
+    const nn = d.nickname ? '@'+d.nickname : '';
+    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span>'+esc(nm)+(un?' <span style="font-size:11px;color:#7c6fff">'+esc(un)+'</span>':'')+(bb?' <span class="b">BANNED</span>':'')+'</span><span style="font-size:10px;color:#585878">'+g.entries.length+'x</span></div><div class="m">'+esc(nn)+(d.hwid?' &middot; '+d.hwid.substring(0,8)+'...':'')+'</div></div>'
   }).join('');
   info()
 }
@@ -226,7 +232,10 @@ function selGroup(key) {
   const el = document.getElementById('detail');
   document.getElementById('blist').style.display='block';
   const bb = bId(d.pc)||bId(d.hwid);
+  const un = (d.firstname||d.lastname) ? ('<div class="i"><div class="l">Ad Soyad</div><div class="v">'+esc((d.firstname||'')+' '+(d.lastname||''))+'</div></div>') : '';
+  const nn = d.nickname ? ('<div class="i"><div class="l">Nickname</div><div class="v">@'+esc(d.nickname)+'</div></div>') : '';
   el.innerHTML='<div class="p"><h2 style="font-size:15px;color:#b088ff;margin-bottom:10px">'+esc(d.pc||'?')+(bb?' <span style="font-size:11px;color:#f56565;background:#f5656515;padding:1px 6px;border-radius:3px">BANNED</span>':'')+' <span class="loc" id="locspan">&#8987;</span></h2>'+
+    un+nn+
     '<div class="i"><div class="l">PC Name</div><div class="v m">'+esc(d.pc||'-')+'</div></div>'+
     '<div class="i"><div class="l">HWID</div><div class="v m" style="font-size:11px">'+esc(d.hwid||'-')+'</div></div>'+
     '<div class="i"><div class="l">IP</div><div class="v m" id="iploc">'+esc(d.ip||'-')+'</div></div>'+
@@ -326,7 +335,6 @@ function parseBan(b) {
   const ts = p.slice(1, -1).join(':');
   const now = Date.now();
   try {
-    // try compact format first (no colons), then ISO
     let start;
     if (ts.indexOf('-') === -1) {
       const y=ts.substr(0,4),mo=ts.substr(4,2),d=ts.substr(6,2),h=ts.substr(9,2),mi=ts.substr(11,2),s=ts.substr(13,2);
