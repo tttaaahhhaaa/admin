@@ -256,12 +256,15 @@ function getGroupIds(g) {
   return ids;
 }
 
+function tsNow() {
+  return new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+
 function makeBanStr(id) {
   if (document.getElementById('bdperm').checked) return id;
   const n = parseInt(document.getElementById('bdn').value) || 24;
   const u = document.getElementById('bdu').value;
-  const ts = new Date().toISOString().split('.')[0] + 'Z';
-  return id + ':' + ts + ':' + n + u;
+  return id + ':' + tsNow() + ':' + n + u;
 }
 
 async function bGroup(key) {
@@ -303,8 +306,7 @@ async function mban(){
   } else {
     const n = parseInt(document.getElementById('mdn').value) || 24;
     const u = document.getElementById('mdu').value;
-    const ts = new Date().toISOString().split('.')[0] + 'Z';
-    e = id + ':' + ts + ':' + n + u;
+    e = id + ':' + tsNow() + ':' + n + u;
   }
   if(!bl.bans.includes(e))bl.bans.push(e);
   bl.unbans=bl.unbans.filter(u=>u!==id);
@@ -318,22 +320,32 @@ async function saveBl(){await fetch(_api,{method:'PATCH',headers:h(),body:JSON.s
 function parseBan(b) {
   const p = b.split(':');
   const id = p[0];
-  if (p.length === 1) return {id, perm:true, old:false, remaining:null};
-  if (p.length === 2) return {id, perm:true, old:true, remaining:null};
-  // id:timestamp:duration
-  const ts = p[1];
-  const dur = p[2];
+  if (p.length === 1) return {id, perm:true, remaining:null, durTxt:''};
+  if (p.length === 2) return {id, perm:true, remaining:null, durTxt:''};
+  const dur = p[p.length-1];
+  const ts = p.slice(1, -1).join(':');
   const now = Date.now();
-  const start = new Date(ts).getTime();
-  if (isNaN(start)) return {id, perm:true, old:true, remaining:null};
-  let secs = 0;
-  if (dur.endsWith('m')) secs = parseInt(dur) * 60;
-  else if (dur.endsWith('h')) secs = parseInt(dur) * 3600;
-  else if (dur.endsWith('d')) secs = parseInt(dur) * 86400;
-  else return {id, perm:true, old:true, remaining:null};
-  const end = start + secs * 1000;
-  const rem = Math.floor((end - now) / 1000);
-  return {id, perm:false, old:false, remaining: rem > 0 ? rem : 0};
+  try {
+    // try compact format first (no colons), then ISO
+    let start;
+    if (ts.indexOf('-') === -1) {
+      const y=ts.substr(0,4),mo=ts.substr(4,2),d=ts.substr(6,2),h=ts.substr(9,2),mi=ts.substr(11,2),s=ts.substr(13,2);
+      start = Date.UTC(+y,+mo-1,+d,+h,+mi,+s);
+    } else {
+      start = new Date(ts).getTime();
+    }
+    if (isNaN(start)) return {id, perm:true, remaining:null, durTxt:''};
+    let secs = 0;
+    const u = dur.slice(-1);
+    const n = parseInt(dur);
+    if (u==='m') secs = n*60;
+    else if (u==='h') secs = n*3600;
+    else if (u==='d') secs = n*86400;
+    else return {id, perm:true, remaining:null, durTxt:''};
+    const end = start + secs*1000;
+    const rem = Math.floor((end - now)/1000);
+    return {id, perm:false, remaining:rem>0?rem:0, durTxt: dur};
+  } catch(e) { return {id, perm:true, remaining:null, durTxt:''} }
 }
 
 function renderBl(){
@@ -345,15 +357,15 @@ function renderBl(){
     let durText, remText;
     if (p.perm) {
       durText = '<span style="color:#f56565">Permanent</span>';
-      remText = p.old ? '<span style="color:#686880;font-size:11px">(eski kayit)</span>' : '';
+      remText = '';
     } else if (p.remaining <= 0) {
-      durText = '<span style="color:#686880">Suresi doldu</span>';
-      remText = '<span style="color:#48bb78">Bitti</span>';
+      durText = '<span style="color:#686880">'+esc(p.durTxt)+'</span>';
+      remText = '<span style="color:#48bb78">Süresi doldu</span>';
     } else {
       const h = Math.floor(p.remaining / 3600);
       const m = Math.floor((p.remaining % 3600) / 60);
-      durText = '<span style="color:#e8a050">'+p.dur+'</span>';
-      remText = '<span style="color:#48bb78">'+(h>0?h+'s ':'')+m+'dk kaldi</span>';
+      durText = '<span style="color:#e8a050">'+esc(p.durTxt)+'</span>';
+      remText = '<span style="color:#48bb78">'+(h>0?h+'s ':'')+m+'dk kaldı</span>';
     }
     rows.push('<tr><td><span style="font-family:monospace;font-size:12px">'+esc(p.id)+'</span></td><td>'+durText+'</td><td>'+remText+'</td><td><button class="bu del" onclick="rBan(\''+esc(b)+'\')">Remove</button></td></tr>');
   }
