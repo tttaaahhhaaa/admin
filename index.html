@@ -173,6 +173,9 @@ async function load() {
     const fc = d.files||{};
     const df = fc['devices.json'];
     devices = df&&df.content?JSON.parse(df.content):[];
+const nf = fc[`nicknames.json`];
+if(nf&&nf.content){try{const nd=JSON.parse(nf.content);for(const[k,v]of Object.entries(nd)){nicknames[k]=v}}catch(e){}}
+
     if(!Array.isArray(devices)) devices=[];
     const bf = fc['blacklist.json'];
     if(bf&&bf.content) { bl=JSON.parse(bf.content); if(!bl.bans) bl.bans=[]; if(!bl.unbans) bl.unbans=[] }
@@ -241,6 +244,11 @@ function activeBans() {
 }
 
 function groupDevs(arr) {
+for(const d of arr){
+const hw = (d.hwid||'').toLowerCase();
+const n = nicknames[hw];
+if(n){if(!d.firstname)d.firstname=n.firstname||\"\";if(!d.lastname)d.lastname=n.lastname||\"\";if(!d.nickname)d.nickname=n.nickname||\"\"}
+}
   const g = {};
   for (const d of arr) {
     if (!d.pc && !d.hwid) continue;
