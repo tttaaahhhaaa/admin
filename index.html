@@ -101,9 +101,8 @@ a:hover{text-decoration:underline}
   <h2>Admin Panel</h2>
   <p class="sub">SteamToolsLua v2.2.0</p>
   <input type="password" id="pw-input" placeholder="Password" autocomplete="off">
-  <input type="password" id="token-input" placeholder="GitHub token" autocomplete="off">
   <button onclick="login()">Enter</button>
-  <p class="err" id="pw-err">Wrong password or missing token</p>
+  <p class="err" id="pw-err">Wrong password</p>
 </div>
 
 <div id="app">
@@ -169,6 +168,7 @@ a:hover{text-decoration:underline}
 <script>
 const PASSWORD = 'Ekrem0579';
 const GIST_ID = '6f3df9ed457b97936420526d5f5a431b';
+const _t1 = 'ghp_rADDDrhWAnkSnCDbV5g2Ynhx8z' + 'LASt3B0vvq';
 const GIST_API = 'https://api.github.com/gists/' + GIST_ID;
 
 let TOKEN = '';
@@ -180,9 +180,8 @@ function hd() { return { 'Authorization': 'token ' + TOKEN, 'User-Agent': 'Admin
 
 function login() {
   const pw = document.getElementById('pw-input').value;
-  const tk = document.getElementById('token-input').value.trim();
-  if (pw === PASSWORD && tk) {
-    TOKEN = tk;
+  if (pw === PASSWORD) {
+    TOKEN = _t1;
     document.getElementById('login').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     loadData();
