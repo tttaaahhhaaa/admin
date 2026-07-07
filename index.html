@@ -163,6 +163,7 @@ function bId(id) {
 function groupDevs(arr) {
   const g = {};
   for (const d of arr) {
+    if (!d.pc && !d.hwid) continue;
     const k = (d.pc||'') + '|' + (d.hwid||'');
     if (!g[k]) g[k] = [];
     g[k].push(d);
@@ -178,19 +179,18 @@ function groupDevs(arr) {
 function render() {
   const el=document.getElementById('devlist');
   const q=document.getElementById('q').value.toLowerCase().trim();
-  if(!devices.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:#585878;font-size:13px">No devices</div>'; info(); return }
   const groups = groupDevs(devices);
+  if(!groups.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:#585878;font-size:13px">No devices</div>'; info(); return }
   const f = q ? groups.filter(g => {
     const d = g.latest;
-    return (d.user&&d.user.toLowerCase().includes(q))||(d.pc&&d.pc.toLowerCase().includes(q))||(d.hwid&&d.hwid.toLowerCase().includes(q));
+    return (d.pc&&d.pc.toLowerCase().includes(q))||(d.hwid&&d.hwid.toLowerCase().includes(q));
   }) : groups;
   if(!f.length) { el.innerHTML='<div style="text-align:center;padding:20px;color:#585878;font-size:13px">No match</div>'; info(); return }
   el.innerHTML=f.map(g => {
     const d = g.latest;
     const a = g.key===selKey?' sel':'';
     const bb = bId(d.pc)||bId(d.hwid);
-    const nm = d.user||d.pc||'?';
-    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span>'+esc(nm)+(bb?' <span class="b">BANNED</span>':'')+'</span><span style="font-size:10px;color:#585878">'+g.entries.length+'x</span></div><div class="m">'+esc(d.pc||'')+(d.hwid?' &middot; '+d.hwid.substring(0,8)+'...':'')+'</div></div>'
+    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span>'+esc(d.pc||'?')+(bb?' <span class="b">BANNED</span>':'')+'</span><span style="font-size:10px;color:#585878">'+g.entries.length+'x</span></div><div class="m">'+(d.hwid?d.hwid.substring(0,8)+'...':'')+'</div></div>'
   }).join('');
   info()
 }
@@ -219,14 +219,12 @@ function selGroup(key) {
   const d = g.latest;
   const el = document.getElementById('detail');
   document.getElementById('blist').style.display='block';
-  const nm = d.user||d.pc||'Unknown';
   const bb = bId(d.pc)||bId(d.hwid);
-  el.innerHTML='<div class="p"><h2 style="font-size:15px;color:#b088ff;margin-bottom:10px">'+esc(nm)+(bb?' <span style="font-size:11px;color:#f56565;background:#f5656515;padding:1px 6px;border-radius:3px">BANNED</span>':'')+' <span class="loc" id="locspan">&#8987;</span></h2>'+
-    '<div class="i"><div class="l">Username</div><div class="v">'+esc(d.user||'-')+'</div></div>'+
+  el.innerHTML='<div class="p"><h2 style="font-size:15px;color:#b088ff;margin-bottom:10px">'+esc(d.pc||'?')+(bb?' <span style="font-size:11px;color:#f56565;background:#f5656515;padding:1px 6px;border-radius:3px">BANNED</span>':'')+' <span class="loc" id="locspan">&#8987;</span></h2>'+
     '<div class="i"><div class="l">PC Name</div><div class="v m">'+esc(d.pc||'-')+'</div></div>'+
     '<div class="i"><div class="l">HWID</div><div class="v m" style="font-size:11px">'+esc(d.hwid||'-')+'</div></div>'+
     '<div class="i"><div class="l">IP</div><div class="v m" id="iploc">'+esc(d.ip||'-')+'</div></div>'+
-    (g.entries.length>1?'<div class="times"><b>Login Times ('+g.entries.length+'):</b>'+g.entries.map(e => '<div>'+new Date(e.time).toLocaleString()+'</div>').join('')+'</div>':'')+
+    (g.entries.length>1?'<div class="times"><b>Login Times ('+g.entries.length+'):</b>'+g.entries.map(e => '<div>'+(e.time?new Date(e.time).toLocaleString():'-')+'</div>').join('')+'</div>':'')+
     '<div class="a"><select id="bd"><option value="0">Permanent</option><option value="24">24h</option><option value="72">3d</option><option value="168">7d</option><option value="720">30d</option></select>'+
     '<button class="bb" onclick="bGroup(\''+key+'\')">Ban All</button>'+
     '<button class="bu" onclick="uGroup(\''+key+'\')">Unban All</button>'+
