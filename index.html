@@ -247,7 +247,7 @@ function groupDevs(arr) {
 for(const d of arr){
 const hw = (d.hwid||'').toLowerCase();
 const n = nicknames[hw];
-if(n){if(!d.firstname)d.firstname=n.firstname||\"\";if(!d.lastname)d.lastname=n.lastname||\"\";if(!d.nickname)d.nickname=n.nickname||\"\"}
+if(n){if(!d.firstname)d.firstname=n.firstname||"";if(!d.lastname)d.lastname=n.lastname||"";if(!d.nickname)d.nickname=n.nickname||""}
 }
   const g = {};
   for (const d of arr) {
