@@ -173,7 +173,7 @@ async function load() {
     const fc = d.files||{};
     const df = fc['devices.json'];
     devices = df&&df.content?JSON.parse(df.content):[];
-const nf = fc[`nicknames.json`];
+let nicknames = {};`nconst nf = fc[`nicknames.json`];
 if(nf&&nf.content){try{const nd=JSON.parse(nf.content);for(const[k,v]of Object.entries(nd)){nicknames[k]=v}}catch(e){}}
 
     if(!Array.isArray(devices)) devices=[];
