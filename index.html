@@ -264,6 +264,14 @@ if(n){if(!d.firstname)d.firstname=n.firstname||"";if(!d.lastname)d.lastname=n.la
   return groups;
 }
 
+function fmtTime(t){
+  if(!t)return'';
+  const n=Date.now(),s=Math.floor((n-new Date(t).getTime())/1000);
+  if(s<60)return s+'sn';
+  const m=Math.floor(s/60);if(m<60)return m+'dk';
+  const h=Math.floor(m/60);if(h<24)return h+'s';
+  const d=Math.floor(h/24);return d+'g';
+}
 function render() {
   const el=document.getElementById('devlist');
   const q=document.getElementById('q').value.toLowerCase().trim();
@@ -283,7 +291,7 @@ function render() {
     const bb = bId(d.pc)||bId(d.hwid);
     const un = (d.firstname||d.lastname) ? '<span class="un">'+(d.firstname||'')+' '+(d.lastname||'')+'</span>' : '';
     const nn = d.nickname ? ' @'+d.nickname : '';
-    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span class="pc">'+esc(d.pc||'?')+'</span>'+un+(bb?'<span class="b">BANNED</span>':'')+'<span class="x">'+g.entries.length+'x</span></div><div class="m"><span>'+esc(nn)+'</span>'+(d.hwid?'<span style="color:#585880">'+d.hwid.substring(0,8)+'</span>':'')+'</div></div>'
+    return '<div class="di'+a+'" onclick="selGroup(\''+g.key+'\')"><div class="n"><span class="pc">'+esc(d.pc||'?')+'</span>'+un+(bb?'<span class="b">BANNED</span>':'')+'<span class="x">'+g.entries.length+'x</span></div><div class="m"><span>'+esc(nn)+'</span>'+(d.hwid?'<span style="color:#585880;margin-right:6px">'+d.hwid.substring(0,8)+'</span>':'')+'<span style="color:#3a6a5a;font-size:10px">'+fmtTime(d.time)+'</span></div></div>'
   }).join('');
   info()
 }
