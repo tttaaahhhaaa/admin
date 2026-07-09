@@ -266,11 +266,7 @@ if(n){if(!d.firstname)d.firstname=n.firstname||"";if(!d.lastname)d.lastname=n.la
 
 function fmtTime(t){
   if(!t)return'';
-  const n=Date.now(),s=Math.floor((n-new Date(t).getTime())/1000);
-  if(s<60)return s+'sn';
-  const m=Math.floor(s/60);if(m<60)return m+'dk';
-  const h=Math.floor(m/60);if(h<24)return h+'s';
-  const d=Math.floor(h/24);return d+'g';
+  try{const d=new Date(t);return d.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){return t}
 }
 function render() {
   const el=document.getElementById('devlist');
@@ -322,12 +318,12 @@ function selGroup(key) {
   const bb = bId(d.pc)||bId(d.hwid);
   const un = (d.firstname||d.lastname) ? '<div class="i"><div class="l">Ad Soyad</div><div class="v">'+esc((d.firstname||'')+' '+(d.lastname||''))+' <span class="tag">verified</span></div></div>' : '';
   const nn = d.nickname ? '<div class="i"><div class="l">Nickname</div><div class="v">@'+esc(d.nickname)+'</div></div>' : '';
-  el.innerHTML='<div class="card"><h3 style="font-size:16px;color:#b088ff;margin-bottom:12px;font-weight:700">'+esc(d.pc||'?')+(bb?' <span style="font-size:11px;color:#f56565;background:#f5656518;padding:1px 8px;border-radius:4px;font-weight:700">BANNED</span>':'')+' <span style="font-size:12px;color:#585880;font-weight:400" id="locspan"></span></h3>'+
+  el.innerHTML='<div class="card"><h3 style="font-size:16px;color:#b088ff;margin-bottom:12px;font-weight:700">'+esc(d.pc||'?')+(bb?' <span style="font-size:11px;color:#f56565;background:#f5656518;padding:1px 8px;border-radius:4px;font-weight:700">BANNED</span>':'')+' <span style="font-size:12px;color:#585880;font-weight:400" id="locspan"></span><span style="font-size:11px;color:#3a6a5a;font-weight:400;margin-left:8px">'+fmtTime(d.time)+'</span></h3>'+
     un+nn+
     '<div class="i"><div class="l">PC Name</div><div class="v m">'+esc(d.pc||'-')+'</div></div>'+
     '<div class="i"><div class="l">HWID</div><div class="v m" style="font-size:11px">'+esc(d.hwid||'-')+'</div></div>'+
     '<div class="i"><div class="l">IP</div><div class="v m" id="iploc">'+esc(d.ip||'-')+'</div></div>'+
-    (g.entries.length?'<div class="times"><b>Login Times ('+g.entries.length+'):</b><div class="scroll">'+g.entries.map(e => '<div>'+(e.time?new Date(e.time).toLocaleString():'-')+'</div>').join('')+'</div></div>':'')+
+    (function(){var _e5=g.entries.filter(function(e){try{return Date.now()-new Date(e.time).getTime()<5*86400000}catch(e){return true}});return _e5.length?'<div class="times"><b>Son 5 Gun ('+_e5.length+'):</b><div class="scroll">'+_e5.map(function(e){return '<div>'+(e.time?new Date(e.time).toLocaleString('tr-TR'):'-')+'</div>'}).join('')+'</div></div>':''})()+
     '<div class="a">'+
     '<input type="number" id="bdn" value="24" min="1">'+
     '<select id="bdu"><option value="m">dk</option><option value="h" selected>sa</option><option value="d">gn</option></select>'+
