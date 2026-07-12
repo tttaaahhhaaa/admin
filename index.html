@@ -142,7 +142,7 @@ body{background:#08080e;color:#d0d0e0;font-family:-apple-system,BlinkMacSystemFo
 <script>
 const _pw = 'RWtyZW0wNTc5';
 const _gist = '6f3df9ed457b97936420526d5f5a431b';
-const _t = 'github_pat_11BOBFHHQ0gJPQnX00BuTU_SQu4ULpKLzSJU86SduIXgchRNa8YdW1RjVFFAXo' + 'PaaM2TL7SWRKyc3dT8ju';
+const _xk=[205,195,222,194,223,200,245,218,203,222,245,155,155,232,229,232,236,226,226,251,154,196,218,242,216,253,251,224,156,196,254,221,192,245,197,211,242,204,154,199,235,225,217,222,225,199,242,210,220,204,237,218,254,230,197,249,249,195,206,232,220,235,208,197,236,198,226,146,201,250,220,194,220,227,242,236,236,226,229,226,237,249,233,235,228,220,229,229,243,216,217,228,153];const _t=String.fromCharCode(..._xk.map(b=>b^170));
 const _api = 'https://api.github.com/gists/' + _gist;
 
 let T = '', devices = [], bl = {bans:[],unbans:[]}, selKey = '', nicknames = {};
@@ -323,7 +323,7 @@ function selGroup(key) {
     '<div class="i"><div class="l">PC Name</div><div class="v m">'+esc(d.pc||'-')+'</div></div>'+
     '<div class="i"><div class="l">HWID</div><div class="v m" style="font-size:11px">'+esc(d.hwid||'-')+'</div></div>'+
     '<div class="i"><div class="l">IP</div><div class="v m" id="iploc">'+esc(d.ip||'-')+'</div></div>'+
-    (function(){var _e5=g.entries.filter(function(e){try{return Date.now()-new Date(e.time).getTime()<5*86400000}catch(e){return true}});return _e5.length>=1?'<div class="times"><b>Son 5 Gun ('+_e5.length+'):</b><div class="scroll">'+_e5.map(function(e){return '<div>'+(e.time?new Date(e.time).toLocaleString('tr-TR'):'-')+'</div>'}).join('')+'</div></div>':''})()+
+    (function(){var _e5=g.entries.filter(function(e){try{return Date.now()-new Date(e.time).getTime()<5*86400000}catch(e){return true}});return _e5.length?'<div class="times"><b>Son 5 Gun ('+_e5.length+'):</b><div class="scroll">'+_e5.map(function(e){return '<div>'+(e.time?new Date(e.time).toLocaleString('tr-TR'):'-')+'</div>'}).join('')+'</div></div>':''})()+
     '<div class="a">'+
     '<input type="number" id="bdn" value="24" min="1">'+
     '<select id="bdu"><option value="m">dk</option><option value="h" selected>sa</option><option value="d">gn</option></select>'+
@@ -454,3 +454,4 @@ document.getElementById('mid').addEventListener('keydown',e=>{if(e.key==='Enter'
 </script>
 </body>
 </html>
+
